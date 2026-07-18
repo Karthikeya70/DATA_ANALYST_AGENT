@@ -1,0 +1,763 @@
+[
+  {
+    "id": "q01",
+    "difficulty": "easy",
+    "tables": [
+      "orders"
+    ],
+    "question": "How many orders are there in total in the orders table?",
+    "ground_truth": 99441,
+    "answer_type": "int",
+    "tolerance": null,
+    "gt_code": "len(orders)",
+    "agent_value": "99441",
+    "correct": true,
+    "grounded": true,
+    "status": "answered",
+    "steps": 2,
+    "sql_errors": 0,
+    "repairs": 0,
+    "cost": 0.000333,
+    "latency": 3.7,
+    "model": "openai/gpt-4o-mini",
+    "explanation": "The total number of orders was computed by counting all rows in the orders table.",
+    "trajectory": [
+      {
+        "step": 1,
+        "type": "run_sql",
+        "sql": "SELECT COUNT(*) AS total_orders FROM orders;",
+        "ok": true,
+        "result_preview": "{\"columns\": [\"total_orders\"], \"rows\": [[99441]], \"truncated\": false}"
+      },
+      {
+        "step": 2,
+        "type": "final_answer",
+        "value": "99441"
+      }
+    ]
+  },
+  {
+    "id": "q02",
+    "difficulty": "easy",
+    "tables": [
+      "orders"
+    ],
+    "question": "How many orders have the status 'canceled'?",
+    "ground_truth": 625,
+    "answer_type": "int",
+    "tolerance": null,
+    "gt_code": "(orders.order_status == 'canceled').sum()",
+    "agent_value": "625",
+    "correct": true,
+    "grounded": true,
+    "status": "answered",
+    "steps": 2,
+    "sql_errors": 0,
+    "repairs": 0,
+    "cost": 0.000342,
+    "latency": 3.9,
+    "model": "openai/gpt-4o-mini",
+    "explanation": "I counted the number of orders in the 'orders' table where the order_status is 'canceled'.",
+    "trajectory": [
+      {
+        "step": 1,
+        "type": "run_sql",
+        "sql": "SELECT COUNT(*) as canceled_orders_count FROM orders WHERE order_status = 'canceled';",
+        "ok": true,
+        "result_preview": "{\"columns\": [\"canceled_orders_count\"], \"rows\": [[625]], \"truncated\": false}"
+      },
+      {
+        "step": 2,
+        "type": "final_answer",
+        "value": "625"
+      }
+    ]
+  },
+  {
+    "id": "q03",
+    "difficulty": "easy",
+    "tables": [
+      "payments"
+    ],
+    "question": "What is the most common payment type?",
+    "ground_truth": "credit_card",
+    "answer_type": "string",
+    "tolerance": null,
+    "gt_code": "payments.payment_type.value_counts().idxmax()",
+    "agent_value": "credit_card",
+    "correct": true,
+    "grounded": true,
+    "status": "answered",
+    "steps": 2,
+    "sql_errors": 0,
+    "repairs": 0,
+    "cost": 0.000352,
+    "latency": 3.1,
+    "model": "openai/gpt-4o-mini",
+    "explanation": "I counted the occurrences of each payment type in the payments table and found that 'credit_card' is the most common payment type with 76,795 occurrences.",
+    "trajectory": [
+      {
+        "step": 1,
+        "type": "run_sql",
+        "sql": "SELECT payment_type, COUNT(*) as count FROM payments GROUP BY payment_type ORDER BY count DESC LIMIT 1;",
+        "ok": true,
+        "result_preview": "{\"columns\": [\"payment_type\", \"count\"], \"rows\": [[\"credit_card\", 76795]], \"truncated\": false}"
+      },
+      {
+        "step": 2,
+        "type": "final_answer",
+        "value": "credit_card"
+      }
+    ]
+  },
+  {
+    "id": "q04",
+    "difficulty": "easy",
+    "tables": [
+      "reviews"
+    ],
+    "question": "What is the average review score across all rows of the reviews table, rounded to 2 decimal places?",
+    "ground_truth": 4.09,
+    "answer_type": "float",
+    "tolerance": 0.01,
+    "gt_code": "round(reviews.review_score.mean(), 2)",
+    "agent_value": "4.09",
+    "correct": true,
+    "grounded": true,
+    "status": "answered",
+    "steps": 2,
+    "sql_errors": 0,
+    "repairs": 0,
+    "cost": 0.000352,
+    "latency": 3.5,
+    "model": "openai/gpt-4o-mini",
+    "explanation": "The average review score was calculated using the AVG function on the review_score column from the reviews table, and the result was rounded to 2 decimal places.",
+    "trajectory": [
+      {
+        "step": 1,
+        "type": "run_sql",
+        "sql": "SELECT ROUND(AVG(review_score), 2) AS average_review_score FROM reviews;",
+        "ok": true,
+        "result_preview": "{\"columns\": [\"average_review_score\"], \"rows\": [[4.09]], \"truncated\": false}"
+      },
+      {
+        "step": 2,
+        "type": "final_answer",
+        "value": "4.09"
+      }
+    ]
+  },
+  {
+    "id": "q05",
+    "difficulty": "medium",
+    "tables": [
+      "orders"
+    ],
+    "question": "In which calendar month were the most orders placed? Answer in YYYY-MM format, based on order_purchase_timestamp.",
+    "ground_truth": "2017-11",
+    "answer_type": "string",
+    "tolerance": null,
+    "gt_code": "orders.order_purchase_timestamp.dt.to_period('M').value_counts().idxmax()",
+    "agent_value": "2017-11",
+    "correct": true,
+    "grounded": true,
+    "status": "answered",
+    "steps": 2,
+    "sql_errors": 0,
+    "repairs": 0,
+    "cost": 0.000367,
+    "latency": 3.4,
+    "model": "openai/gpt-4o-mini",
+    "explanation": "I counted the number of orders placed in each month by grouping the order_purchase_timestamp by month and then selecting the month with the highest count.",
+    "trajectory": [
+      {
+        "step": 1,
+        "type": "run_sql",
+        "sql": "SELECT strftime('%Y-%m', order_purchase_timestamp) AS month, COUNT(*) AS order_count\nFROM orders\nGROUP BY month\nORDER BY order_count DESC\nLIMIT 1;",
+        "ok": true,
+        "result_preview": "{\"columns\": [\"month\", \"order_count\"], \"rows\": [[\"2017-11\", 7544]], \"truncated\": false}"
+      },
+      {
+        "step": 2,
+        "type": "final_answer",
+        "value": "2017-11"
+      }
+    ]
+  },
+  {
+    "id": "q06",
+    "difficulty": "medium",
+    "tables": [
+      "customers"
+    ],
+    "question": "Which customer state (2-letter code) has the most customers, counting rows of the customers table?",
+    "ground_truth": "SP",
+    "answer_type": "string",
+    "tolerance": null,
+    "gt_code": "customers.customer_state.value_counts().idxmax()",
+    "agent_value": "SP",
+    "correct": true,
+    "grounded": true,
+    "status": "answered",
+    "steps": 2,
+    "sql_errors": 0,
+    "repairs": 0,
+    "cost": 0.000364,
+    "latency": 3.9,
+    "model": "openai/gpt-4o-mini",
+    "explanation": "I counted the number of customers in each state by grouping the rows in the customers table by customer_state and then ordered the results to find the state with the most customers.",
+    "trajectory": [
+      {
+        "step": 1,
+        "type": "run_sql",
+        "sql": "SELECT customer_state, COUNT(*) as customer_count \nFROM customers \nGROUP BY customer_state \nORDER BY customer_count DESC \nLIMIT 1;",
+        "ok": true,
+        "result_preview": "{\"columns\": [\"customer_state\", \"customer_count\"], \"rows\": [[\"SP\", 41746]], \"truncated\": false}"
+      },
+      {
+        "step": 2,
+        "type": "final_answer",
+        "value": "SP"
+      }
+    ]
+  },
+  {
+    "id": "q07",
+    "difficulty": "medium",
+    "tables": [
+      "orders",
+      "items"
+    ],
+    "question": "What is the total revenue from delivered orders, where revenue is defined as the sum of item prices (the price column, excluding freight) over all items belonging to orders with status 'delivered'? Round to 2 decimal places.",
+    "ground_truth": 13221498.11,
+    "answer_type": "float",
+    "tolerance": 1.0,
+    "gt_code": "items.merge(orders[orders.order_status=='delivered'][['order_id']], on='order_id').price.sum()",
+    "agent_value": "13221498.11",
+    "correct": true,
+    "grounded": true,
+    "status": "answered",
+    "steps": 2,
+    "sql_errors": 0,
+    "repairs": 0,
+    "cost": 0.00031,
+    "latency": 5.9,
+    "model": "openai/gpt-4o-mini",
+    "explanation": "The total revenue from delivered orders was calculated by summing the 'price' column from the 'order_items' table for all items associated with orders that have the status 'delivered', and the result was rounded to two decimal places.",
+    "trajectory": [
+      {
+        "step": 1,
+        "type": "run_sql",
+        "sql": "SELECT ROUND(SUM(price), 2) AS total_revenue\nFROM order_items\nJOIN orders ON order_items.order_id = orders.order_id\nWHERE orders.order_status = 'delivered';",
+        "ok": true,
+        "result_preview": "{\"columns\": [\"total_revenue\"], \"rows\": [[13221498.11]], \"truncated\": false}"
+      },
+      {
+        "step": 2,
+        "type": "final_answer",
+        "value": "13221498.11"
+      }
+    ]
+  },
+  {
+    "id": "q08",
+    "difficulty": "medium",
+    "tables": [
+      "orders"
+    ],
+    "question": "How many orders with status 'delivered' are missing the actual delivery timestamp (order_delivered_customer_date is null)?",
+    "ground_truth": 8,
+    "answer_type": "int",
+    "tolerance": null,
+    "gt_code": "orders[(orders.order_status=='delivered') & orders.order_delivered_customer_date.isna()].shape[0]",
+    "agent_value": "8",
+    "correct": true,
+    "grounded": true,
+    "status": "answered",
+    "steps": 2,
+    "sql_errors": 0,
+    "repairs": 0,
+    "cost": 0.000359,
+    "latency": 3.4,
+    "model": "openai/gpt-4o-mini",
+    "explanation": "I counted the number of orders with status 'delivered' where the order_delivered_customer_date is NULL, resulting in 8 orders.",
+    "trajectory": [
+      {
+        "step": 1,
+        "type": "run_sql",
+        "sql": "SELECT COUNT(*) as missing_delivery_count \nFROM orders \nWHERE order_status = 'delivered' AND order_delivered_customer_date IS NULL;",
+        "ok": true,
+        "result_preview": "{\"columns\": [\"missing_delivery_count\"], \"rows\": [[8]], \"truncated\": false}"
+      },
+      {
+        "step": 2,
+        "type": "final_answer",
+        "value": "8"
+      }
+    ]
+  },
+  {
+    "id": "q09",
+    "difficulty": "hard",
+    "tables": [
+      "orders",
+      "items",
+      "products",
+      "translation"
+    ],
+    "question": "Which product category, using its ENGLISH name from the category translation table, has the highest total revenue (sum of item prices) among delivered orders?",
+    "ground_truth": "health_beauty",
+    "answer_type": "string",
+    "tolerance": null,
+    "gt_code": "items -> join delivered orders -> join products -> join translation -> groupby(english).price.sum().idxmax()",
+    "agent_value": "health_beauty",
+    "correct": true,
+    "grounded": true,
+    "status": "answered",
+    "steps": 2,
+    "sql_errors": 0,
+    "repairs": 0,
+    "cost": 0.000352,
+    "latency": 6.2,
+    "model": "openai/gpt-4o-mini",
+    "explanation": "I calculated the total revenue for each product category by summing the item prices from delivered orders, joining the necessary tables to get the English category names. The category with the highest revenue is 'health_beauty' with a total of 1,233,131.72.",
+    "trajectory": [
+      {
+        "step": 1,
+        "type": "run_sql",
+        "sql": "SELECT ct.product_category_name_english, SUM(oi.price) AS total_revenue\nFROM orders o\nJOIN order_items oi ON o.order_id = oi.order_id\nJOIN products p ON oi.product_id = p.product_id\nJOIN category_translation ct ON p.product_category_name = ct.product_category_name\nWHERE o.order_status = 'delivered'\nGROUP BY ct.product_category_name_english\nORDER BY total_revenue DESC\nLIMIT 1;",
+        "ok": true,
+        "result_preview": "{\"columns\": [\"product_category_name_english\", \"total_revenue\"], \"rows\": [[\"health_beauty\", 1233131.72]], \"truncated\": false}"
+      },
+      {
+        "step": 2,
+        "type": "final_answer",
+        "value": "health_beauty"
+      }
+    ]
+  },
+  {
+    "id": "q10",
+    "difficulty": "hard",
+    "tables": [
+      "orders"
+    ],
+    "question": "What percentage of delivered orders arrived LATE, i.e. the actual delivery date is after the estimated delivery date? Consider only delivered orders that have a non-null delivery date. Round to 2 decimal places.",
+    "ground_truth": 8.11,
+    "answer_type": "float",
+    "tolerance": 0.05,
+    "gt_code": "d = delivered & delivery date notna; 100 * (d.delivered_date > d.estimated_date).mean()",
+    "agent_value": "8.11",
+    "correct": true,
+    "grounded": true,
+    "status": "answered",
+    "steps": 2,
+    "sql_errors": 0,
+    "repairs": 0,
+    "cost": 0.000339,
+    "latency": 3.9,
+    "model": "openai/gpt-4o-mini",
+    "explanation": "I calculated the percentage of delivered orders that arrived late by counting the number of delivered orders where the actual delivery date is after the estimated delivery date, divided by the total number of delivered orders with a non-null delivery date, and then multiplied by 100. The result was rounded to two decimal places.",
+    "trajectory": [
+      {
+        "step": 1,
+        "type": "run_sql",
+        "sql": "SELECT\n    ROUND(100.0 * SUM(CASE WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1 ELSE 0 END) / COUNT(*), 2) AS late_delivery_percentage\nFROM\n    orders\nWHERE\n    order_status = 'delivered'\n    AND order_delivered_customer_date IS NOT NULL;",
+        "ok": true,
+        "result_preview": "{\"columns\": [\"late_delivery_percentage\"], \"rows\": [[8.11]], \"truncated\": false}"
+      },
+      {
+        "step": 2,
+        "type": "final_answer",
+        "value": "8.11"
+      }
+    ]
+  },
+  {
+    "id": "q11",
+    "difficulty": "hard",
+    "tables": [
+      "orders",
+      "items",
+      "sellers"
+    ],
+    "question": "Which seller state (2-letter code) generated the highest total revenue (sum of item prices) from delivered orders?",
+    "ground_truth": "SP",
+    "answer_type": "string",
+    "tolerance": null,
+    "gt_code": "items -> join delivered orders -> join sellers -> groupby(seller_state).price.sum().idxmax()",
+    "agent_value": "SP",
+    "correct": true,
+    "grounded": true,
+    "status": "answered",
+    "steps": 2,
+    "sql_errors": 0,
+    "repairs": 0,
+    "cost": 0.000318,
+    "latency": 4.6,
+    "model": "openai/gpt-4o-mini",
+    "explanation": "I calculated the total revenue from delivered orders by summing the item prices for each seller state, then identified the state with the highest total revenue.",
+    "trajectory": [
+      {
+        "step": 1,
+        "type": "run_sql",
+        "sql": "SELECT s.seller_state, SUM(oi.price) AS total_revenue\nFROM orders o\nJOIN order_items oi ON o.order_id = oi.order_id\nJOIN sellers s ON oi.seller_id = s.seller_id\nWHERE o.order_status = 'delivered'\nGROUP BY s.seller_state\nORDER BY total_revenue DESC\nLIMIT 1;",
+        "ok": true,
+        "result_preview": "{\"columns\": [\"seller_state\", \"total_revenue\"], \"rows\": [[\"SP\", 8509511.46]], \"truncated\": false}"
+      },
+      {
+        "step": 2,
+        "type": "final_answer",
+        "value": "SP"
+      }
+    ]
+  },
+  {
+    "id": "q12",
+    "difficulty": "hard",
+    "tables": [
+      "orders",
+      "reviews"
+    ],
+    "question": "What is the average review score of delivered orders that arrived later than their estimated delivery date? Treat every row of the reviews table joined to such orders as one data point. Round to 2 decimal places.",
+    "ground_truth": 2.57,
+    "answer_type": "float",
+    "tolerance": 0.01,
+    "gt_code": "reviews joined to late delivered orders; mean(review_score)",
+    "agent_value": "2.57",
+    "correct": true,
+    "grounded": true,
+    "status": "answered",
+    "steps": 2,
+    "sql_errors": 0,
+    "repairs": 0,
+    "cost": 0.000393,
+    "latency": 4.3,
+    "model": "openai/gpt-4o-mini",
+    "explanation": "I calculated the average review score for delivered orders that arrived later than their estimated delivery date by joining the orders and reviews tables, filtering for the relevant conditions, and rounding the result to two decimal places.",
+    "trajectory": [
+      {
+        "step": 1,
+        "type": "run_sql",
+        "sql": "SELECT ROUND(AVG(r.review_score), 2) AS average_review_score\nFROM orders o\nJOIN reviews r ON o.order_id = r.order_id\nWHERE o.order_status = 'delivered'\nAND o.order_delivered_customer_date > o.order_estimated_delivery_date;",
+        "ok": true,
+        "result_preview": "{\"columns\": [\"average_review_score\"], \"rows\": [[2.57]], \"truncated\": false}"
+      },
+      {
+        "step": 2,
+        "type": "final_answer",
+        "value": "2.57"
+      }
+    ]
+  },
+  {
+    "id": "e01",
+    "difficulty": "expert",
+    "tables": [
+      "order_items"
+    ],
+    "question": "What is the median item price across all rows of the order_items table? Round to 2 decimal places.",
+    "ground_truth": 74.99,
+    "answer_type": "float",
+    "tolerance": 0.01,
+    "gt_code": "items.price.median()",
+    "agent_value": "74.99",
+    "correct": true,
+    "grounded": true,
+    "status": "answered",
+    "steps": 2,
+    "sql_errors": 0,
+    "repairs": 0,
+    "cost": 0.0003,
+    "latency": 3.9,
+    "model": "openai/gpt-4o-mini",
+    "explanation": "The median item price was calculated by ordering the prices in the order_items table and selecting the middle value, rounded to two decimal places.",
+    "trajectory": [
+      {
+        "step": 1,
+        "type": "run_sql",
+        "sql": "SELECT ROUND(AVG(price), 2) AS median_price FROM (SELECT price FROM order_items ORDER BY price LIMIT 2 - (SELECT COUNT(*) FROM order_items) % 2 OFFSET (SELECT (COUNT(*) - 1) / 2 FROM order_items));",
+        "ok": true,
+        "result_preview": "{\"columns\": [\"median_price\"], \"rows\": [[74.99]], \"truncated\": false}"
+      },
+      {
+        "step": 2,
+        "type": "final_answer",
+        "value": "74.99"
+      }
+    ]
+  },
+  {
+    "id": "e02",
+    "difficulty": "expert",
+    "tables": [
+      "orders",
+      "customers"
+    ],
+    "question": "What percentage of customers (identified by customer_unique_id) placed more than one order? Round to 2 decimal places.",
+    "ground_truth": 3.12,
+    "answer_type": "float",
+    "tolerance": 0.05,
+    "gt_code": "orders+customers; orders per customer_unique_id; % with >1",
+    "agent_value": "3.12",
+    "correct": true,
+    "grounded": false,
+    "status": "answered",
+    "steps": 2,
+    "sql_errors": 0,
+    "repairs": 0,
+    "cost": 0.000338,
+    "latency": 5.7,
+    "model": "openai/gpt-4o-mini",
+    "explanation": "There are 96,096 unique customers, and 2,997 of them placed more than one order. The percentage is calculated as (2997 / 96096) * 100, which equals 3.12 when rounded to two decimal places.",
+    "trajectory": [
+      {
+        "step": 1,
+        "type": "run_sql",
+        "sql": "SELECT COUNT(DISTINCT customer_unique_id) AS total_customers,\n       COUNT(DISTINCT CASE WHEN order_count > 1 THEN customer_unique_id END) AS customers_with_multiple_orders\nFROM (SELECT customer_unique_id, COUNT(order_id) AS order_count\n      FROM orders\n      JOIN customers ON orders.customer_id = customers.customer_id\n      GROUP BY customer_unique_id) AS customer_orders;",
+        "ok": true,
+        "result_preview": "{\"columns\": [\"total_customers\", \"customers_with_multiple_orders\"], \"rows\": [[96096, 2997]], \"truncated\": false}"
+      },
+      {
+        "step": 2,
+        "type": "final_answer",
+        "value": "3.12"
+      }
+    ]
+  },
+  {
+    "id": "e03",
+    "difficulty": "expert",
+    "tables": [
+      "order_items"
+    ],
+    "question": "On average, how many item rows does an order have? Compute as: total rows in order_items divided by the number of distinct orders in order_items. Round to 2 decimal places.",
+    "ground_truth": 1.14,
+    "answer_type": "float",
+    "tolerance": 0.01,
+    "gt_code": "len(items) / items.order_id.nunique()",
+    "agent_value": "1.14",
+    "correct": true,
+    "grounded": false,
+    "status": "answered",
+    "steps": 2,
+    "sql_errors": 0,
+    "repairs": 0,
+    "cost": 0.000321,
+    "latency": 4.0,
+    "model": "openai/gpt-4o-mini",
+    "explanation": "The total number of item rows in order_items is 112650, and the number of distinct orders is 98666. Dividing these gives an average of 1.14 item rows per order, rounded to two decimal places.",
+    "trajectory": [
+      {
+        "step": 1,
+        "type": "run_sql",
+        "sql": "SELECT COUNT(*) AS total_item_rows FROM order_items;",
+        "ok": true,
+        "result_preview": "{\"columns\": [\"total_item_rows\"], \"rows\": [[112650]], \"truncated\": false}"
+      },
+      {
+        "step": 1,
+        "type": "run_sql",
+        "sql": "SELECT COUNT(DISTINCT order_id) AS distinct_orders FROM order_items;",
+        "ok": true,
+        "result_preview": "{\"columns\": [\"distinct_orders\"], \"rows\": [[98666]], \"truncated\": false}"
+      },
+      {
+        "step": 2,
+        "type": "final_answer",
+        "value": "1.14"
+      }
+    ]
+  },
+  {
+    "id": "e04",
+    "difficulty": "expert",
+    "tables": [
+      "orders"
+    ],
+    "question": "Considering delivered orders grouped by purchase month (YYYY-MM), which month had the largest INCREASE in number of delivered orders compared to the previous calendar month? Answer in YYYY-MM format.",
+    "ground_truth": "2017-11",
+    "answer_type": "string",
+    "tolerance": null,
+    "gt_code": "monthly delivered counts; diff(); idxmax()",
+    "agent_value": "2017-11",
+    "correct": true,
+    "grounded": true,
+    "status": "answered",
+    "steps": 2,
+    "sql_errors": 0,
+    "repairs": 0,
+    "cost": 0.000342,
+    "latency": 3.7,
+    "model": "openai/gpt-4o-mini",
+    "explanation": "The month with the largest increase in delivered orders compared to the previous month was November 2017, which had 7289 delivered orders, an increase of 2811 from October 2017's 4478 delivered orders.",
+    "trajectory": [
+      {
+        "step": 1,
+        "type": "run_sql",
+        "sql": "SELECT strftime('%Y-%m', order_purchase_timestamp) AS month, COUNT(order_id) AS delivered_orders\nFROM orders\nWHERE order_status = 'delivered'\nGROUP BY month\nORDER BY month;",
+        "ok": true,
+        "result_preview": "{\"columns\": [\"month\", \"delivered_orders\"], \"rows\": [[\"2016-09\", 1], [\"2016-10\", 265], [\"2016-12\", 1], [\"2017-01\", 750], [\"2017-02\", 1653], [\"2017-03\", 2546], [\"2017-04\", 2303], [\"2017-05\", 3546], [\"20"
+      },
+      {
+        "step": 2,
+        "type": "final_answer",
+        "value": "2017-11"
+      }
+    ]
+  },
+  {
+    "id": "e05",
+    "difficulty": "expert",
+    "tables": [
+      "reviews",
+      "orders",
+      "customers"
+    ],
+    "question": "Among customer states having at least 1000 reviews on delivered orders, which state has the highest average review score? Treat each review row as one data point.",
+    "ground_truth": "SP",
+    "answer_type": "string",
+    "tolerance": null,
+    "gt_code": "reviews->delivered orders->customers; states with >=1000 reviews; highest mean score",
+    "agent_value": "SP",
+    "correct": true,
+    "grounded": true,
+    "status": "answered",
+    "steps": 2,
+    "sql_errors": 0,
+    "repairs": 0,
+    "cost": 0.000334,
+    "latency": 5.7,
+    "model": "openai/gpt-4o-mini",
+    "explanation": "I calculated the average review score for each customer state with at least 1000 reviews on delivered orders. The state with the highest average review score is SP, with an average score of approximately 4.25.",
+    "trajectory": [
+      {
+        "step": 1,
+        "type": "run_sql",
+        "sql": "SELECT c.customer_state, AVG(r.review_score) AS average_review_score\nFROM reviews r\nJOIN orders o ON r.order_id = o.order_id\nJOIN customers c ON o.customer_id = c.customer_id\nWHERE o.order_status = 'delivered'\nGROUP BY c.customer_state\nHAVING COUNT(r.review_id) >= 1000\nORDER BY average_review_score DESC\nLIMIT 1;",
+        "ok": true,
+        "result_preview": "{\"columns\": [\"customer_state\", \"average_review_score\"], \"rows\": [[\"SP\", 4.246196028060468]], \"truncated\": false}"
+      },
+      {
+        "step": 2,
+        "type": "final_answer",
+        "value": "SP"
+      }
+    ]
+  },
+  {
+    "id": "e06",
+    "difficulty": "expert",
+    "tables": [
+      "payments"
+    ],
+    "question": "What percentage of orders in the payments table used more than one DISTINCT payment type? Round to 2 decimal places.",
+    "ground_truth": 2.26,
+    "answer_type": "float",
+    "tolerance": 0.05,
+    "gt_code": "payments.groupby(order_id).payment_type.nunique(); % >1",
+    "agent_value": "78.54",
+    "correct": false,
+    "grounded": false,
+    "status": "answered",
+    "steps": 2,
+    "sql_errors": 0,
+    "repairs": 0,
+    "cost": 0.000327,
+    "latency": 4.7,
+    "model": "openai/gpt-4o-mini",
+    "explanation": "There are 99,440 total orders in the payments table, and 78,126 of those used more than one distinct payment type. The percentage is calculated as (78126 / 99440) * 100, rounded to 2 decimal places.",
+    "trajectory": [
+      {
+        "step": 1,
+        "type": "run_sql",
+        "sql": "SELECT COUNT(DISTINCT order_id) AS total_orders,\n       COUNT(DISTINCT order_id) FILTER (WHERE payment_type IN (\n           SELECT payment_type\n           FROM payments\n           GROUP BY order_id\n           HAVING COUNT(DISTINCT payment_type) > 1\n       )) AS multi_payment_orders\nFROM payments;",
+        "ok": true,
+        "result_preview": "{\"columns\": [\"total_orders\", \"multi_payment_orders\"], \"rows\": [[99440, 78126]], \"truncated\": false}"
+      },
+      {
+        "step": 2,
+        "type": "final_answer",
+        "value": "78.54"
+      }
+    ]
+  },
+  {
+    "id": "e07",
+    "difficulty": "expert",
+    "tables": [
+      "orders",
+      "order_items",
+      "products",
+      "category_translation"
+    ],
+    "question": "Among product categories (English names) with at least 100 items sold in delivered orders, which category has the highest AVERAGE freight value per item?",
+    "ground_truth": "computers",
+    "answer_type": "string",
+    "tolerance": null,
+    "gt_code": "items->delivered->products->translation; cats >=100 items; highest mean freight_value",
+    "agent_value": "computers",
+    "correct": true,
+    "grounded": true,
+    "status": "answered",
+    "steps": 2,
+    "sql_errors": 0,
+    "repairs": 0,
+    "cost": 0.000362,
+    "latency": 5.6,
+    "model": "openai/gpt-4o-mini",
+    "explanation": "I calculated the average freight value per item for each product category in delivered orders, filtering for categories with at least 100 items sold. The category with the highest average freight value is 'computers' with an average of approximately 48.57.",
+    "trajectory": [
+      {
+        "step": 1,
+        "type": "run_sql",
+        "sql": "SELECT ct.product_category_name_english, AVG(oi.freight_value) AS avg_freight_value\nFROM order_items oi\nJOIN orders o ON oi.order_id = o.order_id\nJOIN products p ON oi.product_id = p.product_id\nJOIN category_translation ct ON p.product_category_name = ct.product_category_name\nWHERE o.order_status = 'delivered'\nGROUP BY ct.product_category_name_english\nHAVING COUNT(oi.order_item_id) >= 100\nORDER BY avg_freight_value DESC\nLIMIT 1;",
+        "ok": true,
+        "result_preview": "{\"columns\": [\"product_category_name_english\", \"avg_freight_value\"], \"rows\": [[\"computers\", 48.57095477386935]], \"truncated\": false}"
+      },
+      {
+        "step": 2,
+        "type": "final_answer",
+        "value": "computers"
+      }
+    ]
+  },
+  {
+    "id": "e08",
+    "difficulty": "expert",
+    "tables": [
+      "orders",
+      "payments"
+    ],
+    "question": "What percentage of delivered orders (that appear in the payments table) were paid ENTIRELY by voucher — i.e. every payment row of that order has payment_type = 'voucher'? Round to 2 decimal places.",
+    "ground_truth": 1.55,
+    "answer_type": "float",
+    "tolerance": 0.05,
+    "gt_code": "delivered orders in payments; groupby order: all rows voucher; %",
+    "agent_value": "1.55",
+    "correct": true,
+    "grounded": true,
+    "status": "answered",
+    "steps": 2,
+    "sql_errors": 0,
+    "repairs": 0,
+    "cost": 0.000401,
+    "latency": 5.4,
+    "model": "openai/gpt-4o-mini",
+    "explanation": "I calculated the percentage of delivered orders that were paid entirely by voucher by first identifying all delivered orders and then filtering those to find orders where every payment was made using a voucher. The final percentage was computed by dividing the count of such voucher-only orders by the total count of delivered orders and rounding to two decimal places.",
+    "trajectory": [
+      {
+        "step": 1,
+        "type": "run_sql",
+        "sql": "WITH delivered_orders AS (\n    SELECT DISTINCT o.order_id\n    FROM orders o\n    WHERE o.order_status = 'delivered'\n),\nvoucher_orders AS (\n    SELECT p.order_id\n    FROM payments p\n    JOIN delivered_orders d ON p.order_id = d.order_id\n    GROUP BY p.order_id\n    HAVING COUNT(CASE WHEN p.payment_type != 'voucher' THEN 1 END) = 0\n)\nSELECT \n    ROUND(CAST(COUNT(DISTINCT v.order_id) AS FLOAT) / COUNT(DISTINCT d.order_id) * 100, 2) AS percentage\nFROM delivered_orders d\nLEFT JOIN voucher_orders v ON d.order_id = v.order_id;",
+        "ok": true,
+        "result_preview": "{\"columns\": [\"percentage\"], \"rows\": [[1.55]], \"truncated\": false}"
+      },
+      {
+        "step": 2,
+        "type": "final_answer",
+        "value": "1.55"
+      }
+    ]
+  }
+]

@@ -1,0 +1,256 @@
+[
+  {
+    "id": "q01",
+    "difficulty": "easy",
+    "tables": [
+      "orders"
+    ],
+    "question": "How many orders are there in total in the orders table?",
+    "ground_truth": 99441,
+    "answer_type": "int",
+    "tolerance": null,
+    "gt_code": "len(orders)"
+  },
+  {
+    "id": "q02",
+    "difficulty": "easy",
+    "tables": [
+      "orders"
+    ],
+    "question": "How many orders have the status 'canceled'?",
+    "ground_truth": 625,
+    "answer_type": "int",
+    "tolerance": null,
+    "gt_code": "(orders.order_status == 'canceled').sum()"
+  },
+  {
+    "id": "q03",
+    "difficulty": "easy",
+    "tables": [
+      "payments"
+    ],
+    "question": "What is the most common payment type?",
+    "ground_truth": "credit_card",
+    "answer_type": "string",
+    "tolerance": null,
+    "gt_code": "payments.payment_type.value_counts().idxmax()"
+  },
+  {
+    "id": "q04",
+    "difficulty": "easy",
+    "tables": [
+      "reviews"
+    ],
+    "question": "What is the average review score across all rows of the reviews table, rounded to 2 decimal places?",
+    "ground_truth": 4.09,
+    "answer_type": "float",
+    "tolerance": 0.01,
+    "gt_code": "round(reviews.review_score.mean(), 2)"
+  },
+  {
+    "id": "q05",
+    "difficulty": "medium",
+    "tables": [
+      "orders"
+    ],
+    "question": "In which calendar month were the most orders placed? Answer in YYYY-MM format, based on order_purchase_timestamp.",
+    "ground_truth": "2017-11",
+    "answer_type": "string",
+    "tolerance": null,
+    "gt_code": "orders.order_purchase_timestamp.dt.to_period('M').value_counts().idxmax()"
+  },
+  {
+    "id": "q06",
+    "difficulty": "medium",
+    "tables": [
+      "customers"
+    ],
+    "question": "Which customer state (2-letter code) has the most customers, counting rows of the customers table?",
+    "ground_truth": "SP",
+    "answer_type": "string",
+    "tolerance": null,
+    "gt_code": "customers.customer_state.value_counts().idxmax()"
+  },
+  {
+    "id": "q07",
+    "difficulty": "medium",
+    "tables": [
+      "orders",
+      "items"
+    ],
+    "question": "What is the total revenue from delivered orders, where revenue is defined as the sum of item prices (the price column, excluding freight) over all items belonging to orders with status 'delivered'? Round to 2 decimal places.",
+    "ground_truth": 13221498.11,
+    "answer_type": "float",
+    "tolerance": 1.0,
+    "gt_code": "items.merge(orders[orders.order_status=='delivered'][['order_id']], on='order_id').price.sum()"
+  },
+  {
+    "id": "q08",
+    "difficulty": "medium",
+    "tables": [
+      "orders"
+    ],
+    "question": "How many orders with status 'delivered' are missing the actual delivery timestamp (order_delivered_customer_date is null)?",
+    "ground_truth": 8,
+    "answer_type": "int",
+    "tolerance": null,
+    "gt_code": "orders[(orders.order_status=='delivered') & orders.order_delivered_customer_date.isna()].shape[0]"
+  },
+  {
+    "id": "q09",
+    "difficulty": "hard",
+    "tables": [
+      "orders",
+      "items",
+      "products",
+      "translation"
+    ],
+    "question": "Which product category, using its ENGLISH name from the category translation table, has the highest total revenue (sum of item prices) among delivered orders?",
+    "ground_truth": "health_beauty",
+    "answer_type": "string",
+    "tolerance": null,
+    "gt_code": "items -> join delivered orders -> join products -> join translation -> groupby(english).price.sum().idxmax()"
+  },
+  {
+    "id": "q10",
+    "difficulty": "hard",
+    "tables": [
+      "orders"
+    ],
+    "question": "What percentage of delivered orders arrived LATE, i.e. the actual delivery date is after the estimated delivery date? Consider only delivered orders that have a non-null delivery date. Round to 2 decimal places.",
+    "ground_truth": 8.11,
+    "answer_type": "float",
+    "tolerance": 0.05,
+    "gt_code": "d = delivered & delivery date notna; 100 * (d.delivered_date > d.estimated_date).mean()"
+  },
+  {
+    "id": "q11",
+    "difficulty": "hard",
+    "tables": [
+      "orders",
+      "items",
+      "sellers"
+    ],
+    "question": "Which seller state (2-letter code) generated the highest total revenue (sum of item prices) from delivered orders?",
+    "ground_truth": "SP",
+    "answer_type": "string",
+    "tolerance": null,
+    "gt_code": "items -> join delivered orders -> join sellers -> groupby(seller_state).price.sum().idxmax()"
+  },
+  {
+    "id": "q12",
+    "difficulty": "hard",
+    "tables": [
+      "orders",
+      "reviews"
+    ],
+    "question": "What is the average review score of delivered orders that arrived later than their estimated delivery date? Treat every row of the reviews table joined to such orders as one data point. Round to 2 decimal places.",
+    "ground_truth": 2.57,
+    "answer_type": "float",
+    "tolerance": 0.01,
+    "gt_code": "reviews joined to late delivered orders; mean(review_score)"
+  },
+  {
+    "id": "e01",
+    "difficulty": "expert",
+    "tables": [
+      "order_items"
+    ],
+    "question": "What is the median item price across all rows of the order_items table? Round to 2 decimal places.",
+    "ground_truth": 74.99,
+    "answer_type": "float",
+    "tolerance": 0.01,
+    "gt_code": "items.price.median()"
+  },
+  {
+    "id": "e02",
+    "difficulty": "expert",
+    "tables": [
+      "orders",
+      "customers"
+    ],
+    "question": "What percentage of customers (identified by customer_unique_id) placed more than one order? Round to 2 decimal places.",
+    "ground_truth": 3.12,
+    "answer_type": "float",
+    "tolerance": 0.05,
+    "gt_code": "orders+customers; orders per customer_unique_id; % with >1"
+  },
+  {
+    "id": "e03",
+    "difficulty": "expert",
+    "tables": [
+      "order_items"
+    ],
+    "question": "On average, how many item rows does an order have? Compute as: total rows in order_items divided by the number of distinct orders in order_items. Round to 2 decimal places.",
+    "ground_truth": 1.14,
+    "answer_type": "float",
+    "tolerance": 0.01,
+    "gt_code": "len(items) / items.order_id.nunique()"
+  },
+  {
+    "id": "e04",
+    "difficulty": "expert",
+    "tables": [
+      "orders"
+    ],
+    "question": "Considering delivered orders grouped by purchase month (YYYY-MM), which month had the largest INCREASE in number of delivered orders compared to the previous calendar month? Answer in YYYY-MM format.",
+    "ground_truth": "2017-11",
+    "answer_type": "string",
+    "tolerance": null,
+    "gt_code": "monthly delivered counts; diff(); idxmax()"
+  },
+  {
+    "id": "e05",
+    "difficulty": "expert",
+    "tables": [
+      "reviews",
+      "orders",
+      "customers"
+    ],
+    "question": "Among customer states having at least 1000 reviews on delivered orders, which state has the highest average review score? Treat each review row as one data point.",
+    "ground_truth": "SP",
+    "answer_type": "string",
+    "tolerance": null,
+    "gt_code": "reviews->delivered orders->customers; states with >=1000 reviews; highest mean score"
+  },
+  {
+    "id": "e06",
+    "difficulty": "expert",
+    "tables": [
+      "payments"
+    ],
+    "question": "What percentage of orders in the payments table used more than one DISTINCT payment type? Round to 2 decimal places.",
+    "ground_truth": 2.26,
+    "answer_type": "float",
+    "tolerance": 0.05,
+    "gt_code": "payments.groupby(order_id).payment_type.nunique(); % >1"
+  },
+  {
+    "id": "e07",
+    "difficulty": "expert",
+    "tables": [
+      "orders",
+      "order_items",
+      "products",
+      "category_translation"
+    ],
+    "question": "Among product categories (English names) with at least 100 items sold in delivered orders, which category has the highest AVERAGE freight value per item?",
+    "ground_truth": "computers",
+    "answer_type": "string",
+    "tolerance": null,
+    "gt_code": "items->delivered->products->translation; cats >=100 items; highest mean freight_value"
+  },
+  {
+    "id": "e08",
+    "difficulty": "expert",
+    "tables": [
+      "orders",
+      "payments"
+    ],
+    "question": "What percentage of delivered orders (that appear in the payments table) were paid ENTIRELY by voucher — i.e. every payment row of that order has payment_type = 'voucher'? Round to 2 decimal places.",
+    "ground_truth": 1.55,
+    "answer_type": "float",
+    "tolerance": 0.05,
+    "gt_code": "delivered orders in payments; groupby order: all rows voucher; %"
+  }
+]
