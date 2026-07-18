@@ -37,9 +37,26 @@ _ALLOWED_ACTIONS = {
     sqlite3.SQLITE_FUNCTION,
 }
 
+# Read-only schema introspection is legitimate analyst behavior: when a
+# query fails with "no such column", the agent's natural recovery is
+# SELECT ... FROM pragma_table_info('x'). Blocking ALL pragmas (as we
+# first did) made the sandbox fight the agent's own debugging — we
+# watched it burn 10 steps on "not authorized". So these specific
+# READ-ONLY pragmas are allowed; write-pragmas (writable_schema, etc.)
+# remain denied, and statements STARTING with PRAGMA are still rejected
+# by the shape check anyway.
+_ALLOWED_PRAGMAS = {
+    "table_info", "table_xinfo", "table_list", "index_list",
+    "index_info", "foreign_key_list", "database_list",
+}
+
 
 def _authorizer(action, arg1, arg2, db_name, trigger):
-    return sqlite3.SQLITE_OK if action in _ALLOWED_ACTIONS else sqlite3.SQLITE_DENY
+    if action in _ALLOWED_ACTIONS:
+        return sqlite3.SQLITE_OK
+    if action == sqlite3.SQLITE_PRAGMA and (arg1 or "").lower() in _ALLOWED_PRAGMAS:
+        return sqlite3.SQLITE_OK
+    return sqlite3.SQLITE_DENY
 
 
 def _strip_comments(sql: str) -> str:

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data Analyst Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --offwhite:#e3e1df; --offblack:#0e0c0c; --white:#eee;
+  --green:#4eea3a; --red:#f93c31; --yellow:#ffd84d; --blue:#1e93ff;
+  --blue-light:#4fe3f0; --magenta:#e53aa3; --orange:#ff8a1f;
+  --gray:#555; --gray-light:#999; --border:#222;
+  --mono:"Space Mono",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--offblack);color:var(--offwhite);font-family:var(--sans);
+  font-size:15px;line-height:24px;min-height:100vh}
+.wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+.mono{font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--gray-light)}
+
+nav{border-bottom:1px solid var(--border)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:56px}
+.grid-logo{display:grid;grid-template-columns:repeat(4,10px);grid-template-rows:repeat(2,10px);gap:2px}
+.grid-logo i{display:block;width:10px;height:10px}
+
+header{padding:56px 0 32px;border-bottom:1px solid var(--border)}
+h1{font-size:32px;font-weight:400}
+.sub{margin-top:8px;color:var(--gray-light)}
+.sub b{color:var(--offwhite);font-weight:500}
+
+.stats{display:flex;flex-wrap:wrap;border-bottom:1px solid var(--border)}
+.stats .wrap{display:flex;flex-wrap:wrap}
+.stat{padding:18px 32px 18px 0}
+.stat .v{font-family:var(--mono);font-size:22px;color:var(--white)}
+
+.ask{padding:36px 0 8px}
+.askrow{display:flex;gap:12px}
+#q{flex:1;background:transparent;border:1px solid var(--border);color:var(--offwhite);
+  font-family:var(--mono);font-size:14px;padding:14px 16px;outline:none}
+#q:focus{border-color:rgba(255,255,255,.6)}
+#q::placeholder{color:var(--gray)}
+.btn{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.05em;
+  padding:14px 26px;cursor:pointer;border:1px solid var(--white);
+  background:var(--white);color:var(--offblack)}
+.btn:disabled{opacity:.4;cursor:default}
+.examples{padding:14px 0 28px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;color:var(--gray-light);
+  border:1px solid var(--border);padding:6px 12px;cursor:pointer;background:transparent}
+.chip:hover{color:var(--white);border-color:rgba(255,255,255,.6)}
+
+#status{padding:6px 0 20px;color:var(--gray-light);font-family:var(--mono);
+  font-size:12px;min-height:40px}
+.blink{animation:blink 1s steps(2,start) infinite}
+@keyframes blink{to{visibility:hidden}}
+.err{color:var(--red)}
+
+#answerbox{display:none;border:1px solid var(--border);padding:24px;margin-bottom:28px}
+#answerval{font-family:var(--mono);font-size:34px;color:var(--green);word-break:break-all}
+#answerexp{margin-top:10px;color:var(--gray-light)}
+#answermeta{margin-top:14px}
+
+#trajbox{display:none;padding-bottom:56px}
+.thead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+.step{border:1px solid var(--border);margin-bottom:10px}
+.stephead{display:flex;gap:14px;align-items:center;padding:10px 14px;
+  font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.stepnum{color:var(--gray)}
+.badge{padding:2px 8px;font-family:var(--mono);font-size:10px}
+.badge.ok{background:var(--green);color:var(--offblack)}
+.badge.error{background:var(--red);color:var(--offblack)}
+.badge.answer{background:var(--yellow);color:var(--offblack)}
+.repair-note{color:var(--orange)}
+.sql{border-top:1px solid var(--border);padding:12px 14px;font-family:var(--mono);
+  font-size:12px;line-height:19px;color:var(--blue-light);white-space:pre-wrap;word-break:break-word}
+.result{border-top:1px solid var(--border);padding:10px 14px;font-family:var(--mono);
+  font-size:11px;color:var(--gray-light);white-space:pre-wrap;word-break:break-all;
+  max-height:120px;overflow:auto}
+.result.errtext{color:var(--red)}
+
+footer{border-top:1px solid var(--border);padding:22px 0}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+@media(max-width:700px){.askrow{flex-direction:column}.stat{padding:10px 18px 10px 0}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="grid-logo" aria-hidden="true">
+      <i style="background:var(--green)"></i><i style="background:var(--blue)"></i><i style="background:var(--yellow)"></i><i style="background:var(--magenta)"></i>
+      <i style="background:var(--red)"></i><i style="background:var(--blue-light)"></i><i style="background:var(--orange)"></i><i style="background:var(--gray)"></i>
+    </div>
+    <div class="mono">writes SQL &middot; runs it sandboxed &middot; fixes its own errors</div>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap">
+    <h1>Data Analyst Agent</h1>
+    <div class="sub">Ask questions about a real e-commerce database (<b>1.5M rows, 9 tables</b>).
+    The agent writes SQL, executes it in a read-only sandbox, and reports only what
+    the database computed &mdash; watch every attempt below, including its self-repairs.</div>
+    <div class="sub mono" style="margin-top:10px">Presented by <span style="color:var(--white)">Karthikeya (IITGN)</span></div>
+  </div>
+</header>
+
+<div class="stats">
+  <div class="wrap">
+    <div class="stat"><div class="v">{{ accuracy }}</div><div class="mono">benchmark accuracy</div></div>
+    <div class="stat"><div class="v">{{ grounded }}</div><div class="mono">groundedness</div></div>
+    <div class="stat"><div class="v">{{ repairs }}</div><div class="mono">errors self-repaired</div></div>
+    <div class="stat"><div class="v">{{ avg_latency }}</div><div class="mono">avg latency</div></div>
+    <div class="stat"><div class="v">{{ avg_cost }}</div><div class="mono">avg cost / question</div></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="ask">
+    <div class="askrow">
+      <input id="q" type="text" maxlength="500"
+             placeholder="e.g. Which product category has the highest revenue?" autocomplete="off">
+      <button class="btn" id="askbtn">Ask the agent</button>
+    </div>
+    <div class="examples">
+      <button class="chip">Which month had the most orders?</button>
+      <button class="chip">What percentage of deliveries arrived late?</button>
+      <button class="chip">What is the average review score of late deliveries?</button>
+      <button class="chip">What percentage of customers ordered more than once?</button>
+      <button class="chip">Which seller state earns the most revenue?</button>
+    </div>
+    <div id="status"></div>
+  </div>
+
+  <div id="answerbox">
+    <div class="mono" style="margin-bottom:8px;color:var(--green)">Answer &mdash; computed by the database, not guessed</div>
+    <div id="answerval"></div>
+    <div id="answerexp"></div>
+    <div id="answermeta" class="mono"></div>
+  </div>
+
+  <div id="trajbox">
+    <div class="thead">
+      <span class="mono" style="color:var(--white)">Agent trajectory</span>
+      <span class="mono">every SQL attempt, in order &mdash; red = error, followed by the self-repair</span>
+    </div>
+    <div id="steps"></div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="mono">No agent framework &mdash; plain Python loop</span>
+    <span class="mono">SQLite sandbox &middot; gemini-2.5-flash-lite &middot; Olist dataset</span>
+  </div>
+</footer>
+
+<script>
+const $ = s => document.querySelector(s);
+
+document.querySelectorAll(".chip").forEach(c => c.onclick = () => {
+  $("#q").value = c.textContent; $("#q").focus();
+});
+
+function setStatus(msg, cls) {
+  $("#status").innerHTML = msg ? `<span class="${cls || ""}">${msg}</span>` : "";
+}
+
+function esc(t) {
+  const d = document.createElement("div"); d.textContent = t ?? ""; return d.innerHTML;
+}
+
+function render(r) {
+  $("#answerval").textContent = r.answer_value ?? "(no answer)";
+  $("#answerexp").textContent = r.explanation ?? "";
+  $("#answermeta").textContent =
+    `model: ${r.model} · steps: ${r.steps} · sql errors: ${r.sql_errors}` +
+    ` · cost: $${r.cost} · ${r.latency}s`;
+  $("#answerbox").style.display = "block";
+
+  const steps = $("#steps"); steps.innerHTML = "";
+  let n = 0;
+  for (const s of r.trajectory) {
+    if (s.type === "run_sql") {
+      n++;
+      const isErr = !s.ok;
+      let preview = s.result_preview || "";
+      const div = document.createElement("div");
+      div.className = "step";
+      div.innerHTML =
+        `<div class="stephead"><span class="stepnum">step ${n}</span>` +
+        `<span>run_sql</span>` +
+        `<span class="badge ${isErr ? "error" : "ok"}">${isErr ? "ERROR" : "OK"}</span>` +
+        (isErr ? `<span class="repair-note">→ agent reads the error and retries</span>` : "") +
+        `</div><div class="sql">${esc(s.sql)}</div>` +
+        `<div class="result ${isErr ? "errtext" : ""}">${esc(preview)}</div>`;
+      steps.appendChild(div);
+    } else if (s.type === "final_answer") {
+      n++;
+      const div = document.createElement("div");
+      div.className = "step";
+      div.innerHTML =
+        `<div class="stephead"><span class="stepnum">step ${n}</span>` +
+        `<span>final_answer</span><span class="badge answer">DONE</span></div>` +
+        `<div class="sql" style="color:var(--yellow)">${esc(s.value)}</div>`;
+      steps.appendChild(div);
+    }
+  }
+  $("#trajbox").style.display = "block";
+}
+
+async function ask() {
+  const q = $("#q").value.trim();
+  if (!q) { setStatus("Type a question first.", "err"); return; }
+  $("#answerbox").style.display = "none";
+  $("#trajbox").style.display = "none";
+  setStatus('Agent is writing and running SQL... <span class="blink">_</span>');
+  $("#askbtn").disabled = true;
+  try {
+    const resp = await fetch("/api/ask", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({question: q}),
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || ("HTTP " + resp.status));
+    render(data);
+    setStatus("");
+  } catch (e) {
+    setStatus("Error: " + e.message, "err");
+  } finally {
+    $("#askbtn").disabled = false;
+  }
+}
+$("#askbtn").onclick = ask;
+$("#q").addEventListener("keydown", e => { if (e.key === "Enter") ask(); });
+</script>
+</body>
+</html>

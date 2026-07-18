@@ -54,6 +54,13 @@ for name, sql in [
     r = sb.execute(sql)
     check(f"blocks {name}", not r["ok"], str(r))
 
+print("== read-only introspection allowed, write pragmas still blocked ==")
+r = sb.execute("SELECT name FROM pragma_table_info('orders')")
+check("pragma_table_info (read-only) works", r["ok"] and r["row_count"] == 8, str(r)[:80])
+
+r = sb.execute("SELECT * FROM pragma_function_list")
+check("blocks pragma_function_list (not allowlisted)", not r["ok"], str(r)[:80])
+
 print("== resource limits hold ==")
 r = sb.execute("SELECT * FROM orders")
 check("row cap", r["ok"] and r["row_count"] == 50 and r["truncated"], str(r)[:80])
