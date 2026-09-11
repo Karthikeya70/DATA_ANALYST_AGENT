@@ -19,6 +19,7 @@ sys.stdout.reconfigure(encoding="utf-8")
 
 import argparse
 import json
+import os
 import re
 
 from agent import run_agent
@@ -81,6 +82,9 @@ def main():
     ap.add_argument("--model", type=str, default=None,
                     help="override the primary model (for model bake-offs), "
                          "e.g. --model openai/gpt-4o-mini")
+    ap.add_argument("--questions", type=str, default="data/eval/questions.json",
+                    help="path to the question set to grade against "
+                         "(default: the 20-question baseline exam)")
     args = ap.parse_args()
 
     if args.model:
@@ -88,7 +92,7 @@ def main():
         agent_module.MODELS = [args.model]  # no fallback: measure THIS model
         print(f"[model override: {args.model}]")
 
-    with open("data/eval/questions.json", encoding="utf-8") as f:
+    with open(args.questions, encoding="utf-8") as f:
         questions = json.load(f)
     if args.limit:
         questions = questions[:args.limit]
@@ -150,15 +154,17 @@ def main():
             print(f"  {r['id']} ({r['difficulty']}): got {r['agent_value']!r}, "
                   f"expected {r['ground_truth']!r}  [status={r['status']}]")
 
-    # Per-model bake-off runs get their own file so they never clobber
-    # the main baseline results.
+    # Per-model bake-off runs and alternate question sets get their own
+    # file so they never clobber the main baseline results.
+    qset = os.path.splitext(os.path.basename(args.questions))[0]
+    suffix = "" if qset == "questions" else f"_{qset}"
     if args.model:
         slug = args.model.replace("/", "_").replace(":", "_")
-        out = f"data/eval/results_{slug}.json"
+        out = f"data/eval/results_{slug}{suffix}.json"
     elif args.no_repair:
-        out = "data/eval/results_no_repair.json"
+        out = f"data/eval/results_no_repair{suffix}.json"
     else:
-        out = "data/eval/results.json"
+        out = f"data/eval/results{suffix}.json"
     with open(out, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2, ensure_ascii=False, default=str)
     print(f"\nFull results + trajectories saved to {out}")

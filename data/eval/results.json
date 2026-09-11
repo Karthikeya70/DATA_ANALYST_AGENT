@@ -18,7 +18,7 @@
     "sql_errors": 0,
     "repairs": 0,
     "cost": 0.000236,
-    "latency": 6.7,
+    "latency": 2.6,
     "model": "google/gemini-2.5-flash-lite",
     "explanation": "The total number of orders in the orders table is 99441.",
     "trajectory": [
@@ -55,7 +55,7 @@
     "sql_errors": 0,
     "repairs": 0,
     "cost": 0.00024,
-    "latency": 3.1,
+    "latency": 2.7,
     "model": "google/gemini-2.5-flash-lite",
     "explanation": "The number of orders with the status 'canceled' is 625.",
     "trajectory": [
@@ -92,7 +92,7 @@
     "sql_errors": 0,
     "repairs": 0,
     "cost": 0.000246,
-    "latency": 8.2,
+    "latency": 2.5,
     "model": "google/gemini-2.5-flash-lite",
     "explanation": "The most common payment type is credit_card, with 76,795 occurrences.",
     "trajectory": [
@@ -129,7 +129,7 @@
     "sql_errors": 0,
     "repairs": 0,
     "cost": 0.000251,
-    "latency": 5.6,
+    "latency": 2.7,
     "model": "google/gemini-2.5-flash-lite",
     "explanation": "The average review score is calculated by taking the average of all values in the 'review_score' column of the 'reviews' table and rounding the result to two decimal places.",
     "trajectory": [
@@ -166,7 +166,7 @@
     "sql_errors": 0,
     "repairs": 0,
     "cost": 0.000273,
-    "latency": 3.4,
+    "latency": 3.7,
     "model": "google/gemini-2.5-flash-lite",
     "explanation": "The most orders were placed in November 2017, with 7544 orders. The count was determined by grouping orders by the year and month of their purchase timestamp and selecting the month with the highest count.",
     "trajectory": [
@@ -203,7 +203,7 @@
     "sql_errors": 0,
     "repairs": 0,
     "cost": 0.000251,
-    "latency": 5.1,
+    "latency": 2.7,
     "model": "google/gemini-2.5-flash-lite",
     "explanation": "The state with the most customers is SP, with 41,746 customers.",
     "trajectory": [
@@ -241,7 +241,7 @@
     "sql_errors": 0,
     "repairs": 0,
     "cost": 0.000272,
-    "latency": 3.9,
+    "latency": 3.8,
     "model": "google/gemini-2.5-flash-lite",
     "explanation": "The total revenue is the sum of the 'price' column from the 'order_items' table, filtered for orders with the status 'delivered' in the 'orders' table. The result is rounded to two decimal places.",
     "trajectory": [
@@ -278,7 +278,7 @@
     "sql_errors": 0,
     "repairs": 0,
     "cost": 0.00026,
-    "latency": 5.5,
+    "latency": 3.2,
     "model": "google/gemini-2.5-flash-lite",
     "explanation": "There are 8 orders with the status 'delivered' that are missing the actual delivery timestamp. This is found by counting the orders where order_status is 'delivered' and order_delivered_customer_date is NULL.",
     "trajectory": [
@@ -318,7 +318,7 @@
     "sql_errors": 1,
     "repairs": 1,
     "cost": 0.000538,
-    "latency": 33.2,
+    "latency": 20.9,
     "model": "google/gemini-2.5-flash-lite",
     "explanation": "The total revenue for the 'health_beauty' product category was calculated by summing the 'price' of all items in delivered orders and joining with the category translation table to get the English name. This category had the highest total revenue.",
     "trajectory": [
@@ -362,7 +362,7 @@
     "sql_errors": 0,
     "repairs": 0,
     "cost": 0.000294,
-    "latency": 8.5,
+    "latency": 3.8,
     "model": "google/gemini-2.5-flash-lite",
     "explanation": "The percentage of delivered orders that arrived late is calculated by dividing the count of orders where the actual delivery date is after the estimated delivery date by the total count of delivered orders with a non-null delivery date, then multiplying by 100. The result is rounded to two decimal places.",
     "trajectory": [
@@ -401,7 +401,7 @@
     "sql_errors": 0,
     "repairs": 0,
     "cost": 0.000299,
-    "latency": 7.5,
+    "latency": 4.4,
     "model": "google/gemini-2.5-flash-lite",
     "explanation": "The seller state that generated the highest total revenue from delivered orders is SP. This was computed by joining the sellers, order_items, and orders tables, filtering for delivered orders, grouping by seller state, and ordering by the sum of item prices in descending order. The top state was then selected.",
     "trajectory": [
@@ -439,7 +439,7 @@
     "sql_errors": 0,
     "repairs": 0,
     "cost": 0.000291,
-    "latency": 6.5,
+    "latency": 4.0,
     "model": "google/gemini-2.5-flash-lite",
     "explanation": "The average review score for delivered orders that arrived later than their estimated delivery date is 2.57. This is calculated by averaging the review scores of all orders where the actual delivery date was after the estimated delivery date and the order status was 'delivered'.",
     "trajectory": [
@@ -476,7 +476,7 @@
     "sql_errors": 0,
     "repairs": 0,
     "cost": 0.000281,
-    "latency": 4.4,
+    "latency": 3.2,
     "model": "google/gemini-2.5-flash-lite",
     "explanation": "The median item price is calculated by finding the middle value in the sorted list of all item prices. Since there are an even number of items, the average of the two middle prices is taken and rounded to two decimal places.",
     "trajectory": [
@@ -514,7 +514,7 @@
     "sql_errors": 1,
     "repairs": 1,
     "cost": 0.000493,
-    "latency": 7.6,
+    "latency": 6.2,
     "model": "google/gemini-2.5-flash-lite",
     "explanation": "The percentage of customers who placed more than one order was calculated by first counting the number of orders for each unique customer ID. Then, the number of customers with more than one order was divided by the total number of unique customers and multiplied by 100. The result was rounded to two decimal places.",
     "trajectory": [
@@ -558,7 +558,7 @@
     "sql_errors": 0,
     "repairs": 0,
     "cost": 0.000264,
-    "latency": 4.3,
+    "latency": 2.6,
     "model": "google/gemini-2.5-flash-lite",
     "explanation": "The average number of item rows per order is computed by dividing the total number of rows in the order_items table by the number of distinct orders in the same table. The result is 1.14.",
     "trajectory": [
@@ -595,7 +595,7 @@
     "sql_errors": 0,
     "repairs": 0,
     "cost": 0.000331,
-    "latency": 6.8,
+    "latency": 3.6,
     "model": "google/gemini-2.5-flash-lite",
     "explanation": "The month with the largest increase in delivered orders compared to the previous month was 2017-11. This was determined by calculating the month-over-month difference in delivered orders and selecting the month with the maximum positive difference.",
     "trajectory": [
@@ -634,7 +634,7 @@
     "sql_errors": 0,
     "repairs": 0,
     "cost": 0.000306,
-    "latency": 7.6,
+    "latency": 4.7,
     "model": "google/gemini-2.5-flash-lite",
     "explanation": "The average review score for delivered orders from the state of SP is 4.246, which is the highest among states with at least 1000 reviews.",
     "trajectory": [
@@ -671,7 +671,7 @@
     "sql_errors": 1,
     "repairs": 1,
     "cost": 0.000455,
-    "latency": 6.7,
+    "latency": 4.6,
     "model": "google/gemini-2.5-flash-lite",
     "explanation": "The percentage of orders that used more than one distinct payment type was calculated by first determining the number of distinct payment types for each order in the payments table. Then, it counted how many orders had more than one distinct payment type and divided that by the total number of orders in the payments table, multiplying by 100 to get the percentage. The result was rounded to two decimal places.",
     "trajectory": [
@@ -718,7 +718,7 @@
     "sql_errors": 0,
     "repairs": 0,
     "cost": 0.000339,
-    "latency": 8.2,
+    "latency": 4.3,
     "model": "google/gemini-2.5-flash-lite",
     "explanation": "The category with the highest average freight value per item among those with at least 100 items sold in delivered orders is 'computers', with an average freight value of 48.57.",
     "trajectory": [
@@ -756,7 +756,7 @@
     "sql_errors": 0,
     "repairs": 0,
     "cost": 0.000351,
-    "latency": 6.7,
+    "latency": 4.4,
     "model": "google/gemini-2.5-flash-lite",
     "explanation": "The percentage of delivered orders paid entirely by voucher was calculated by first identifying orders that were paid exclusively with vouchers and then dividing that count by the total number of delivered orders that have payment records, with the result rounded to two decimal places.",
     "trajectory": [

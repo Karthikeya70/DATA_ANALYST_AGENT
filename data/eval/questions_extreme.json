@@ -1,0 +1,152 @@
+[
+  {
+    "id": "x01",
+    "difficulty": "extreme",
+    "tables": ["order_items", "payments"],
+    "question": "Consider only order_ids that appear in BOTH order_items and payments. For each such order compute A = SUM(order_items.price) + SUM(order_items.freight_value) and B = SUM(payments.payment_value). Rounding (B - A) to 2 decimals, how many orders have an absolute rounded difference of at least 0.02 BRL (i.e. strictly greater than one centavo)? Include orders of every order_status.",
+    "ground_truth": 303,
+    "answer_type": "int",
+    "tolerance": null,
+    "gt_code": "98,665 orders in both tables; group-sum items (price+freight) vs group-sum payments per order; count |diff| rounded to 2dp >= 0.02"
+  },
+  {
+    "id": "x02",
+    "difficulty": "extreme",
+    "tables": ["orders", "customers"],
+    "question": "Restrict to orders with order_status='delivered' AND a non-null order_delivered_customer_date. An order is LATE if order_delivered_customer_date > order_estimated_delivery_date compared as full timestamps. Group by the customer's customer_state (via orders.customer_id -> customers). Among states with at least 500 such orders, which state has the highest late share? Answer the 2-letter state code.",
+    "ground_truth": "MA",
+    "answer_type": "string",
+    "tolerance": null,
+    "gt_code": "delivered+non-null date; join customers; groupby customer_state; filter count>=500; max mean(late)"
+  },
+  {
+    "id": "x03",
+    "difficulty": "extreme",
+    "tables": ["order_items", "products", "category_translation", "reviews"],
+    "question": "Build order-level categories by joining order_items -> products -> product_category_name_translation. Keep only orders where every item maps to exactly one, non-null English category (drop any order containing an item with a missing or untranslatable category). Keep only order_status='delivered'. Attach one review per order: if an order has multiple review rows, keep the one with the latest review_creation_date (break further ties by latest review_answer_timestamp). Among English categories with at least 500 such orders, which has the highest mean review_score? Answer the English category name.",
+    "ground_truth": "luggage_accessories",
+    "answer_type": "string",
+    "tolerance": null,
+    "gt_code": "order-level single-category filter; delivered only; latest review per order; groupby category filter count>=500; max mean review_score"
+  },
+  {
+    "id": "x04",
+    "difficulty": "extreme",
+    "tables": ["order_items", "orders"],
+    "question": "Restrict to order_items belonging to orders with order_status='delivered'. For each seller_id compute total revenue = SUM(price + freight_value). Rank sellers by that total in descending order. What is the seller_id ranked SECOND?",
+    "ground_truth": "7c67e1448b00f6e969d365cea6b010ab",
+    "answer_type": "string",
+    "tolerance": null,
+    "gt_code": "delivered items; groupby seller_id sum(price+freight); sort desc; take index 1 (0-indexed)"
+  },
+  {
+    "id": "x05",
+    "difficulty": "extreme",
+    "tables": ["orders", "customers"],
+    "question": "Using customers.customer_unique_id (NOT customer_id) as the person identifier, how many distinct customer_unique_id values placed at least 2 distinct order_ids? Count orders of every order_status.",
+    "ground_truth": 2997,
+    "answer_type": "int",
+    "tolerance": null,
+    "gt_code": "join orders+customers; groupby customer_unique_id nunique(order_id); count >= 2"
+  },
+  {
+    "id": "x06",
+    "difficulty": "extreme",
+    "tables": ["order_items", "orders", "sellers", "customers"],
+    "question": "Restrict to order_items rows whose order has order_status='delivered'. Join each item to its seller's seller_state and to the order's customer's customer_state. What percentage of these item rows are cross-state (seller_state != customer_state)? Compute at the ITEM-ROW level, not the order level.",
+    "ground_truth": 63.82,
+    "answer_type": "float",
+    "tolerance": 0.02,
+    "gt_code": "delivered items joined to sellers+customers via orders; row-level pct where seller_state != customer_state"
+  },
+  {
+    "id": "x07",
+    "difficulty": "extreme",
+    "tables": ["order_items", "orders", "reviews"],
+    "question": "Restrict to orders with order_status='delivered' that have exactly ONE distinct seller_id across their items. Attach one review per order using the latest review_creation_date (ties broken by latest review_answer_timestamp). Among sellers with at least 100 such reviewed orders, which seller_id has the LOWEST mean review_score?",
+    "ground_truth": "1ca7077d890b907f89be8c954a02686a",
+    "answer_type": "string",
+    "tolerance": null,
+    "gt_code": "delivered orders with nunique(seller_id)==1; latest review per order; groupby seller_id filter count>=100; min mean review_score"
+  },
+  {
+    "id": "x08",
+    "difficulty": "extreme",
+    "tables": ["order_items", "orders", "products", "category_translation"],
+    "question": "Restrict to order_items rows whose order has order_status='delivered', joined to products and the English translation table. For each English category compute the aggregate freight ratio SUM(freight_value) / SUM(price) (a ratio of sums, NOT the mean of per-row ratios). Among categories with at least 500 such item rows, report the highest ratio.",
+    "ground_truth": 0.2946,
+    "answer_type": "float",
+    "tolerance": 0.0005,
+    "gt_code": "delivered items joined to products+translation; groupby category sum(freight)/sum(price); filter count>=500; max"
+  },
+  {
+    "id": "x09",
+    "difficulty": "extreme",
+    "tables": ["orders"],
+    "question": "Among orders with order_status='delivered' and a non-null order_delivered_customer_date, compute lateness = order_delivered_customer_date - order_estimated_delivery_date in days. Which order_id has the LARGEST lateness?",
+    "ground_truth": "1b3190b2dfa9d789e1f14c05b647a14a",
+    "answer_type": "string",
+    "tolerance": null,
+    "gt_code": "delivered+non-null date; lateness_days = delivered_date - estimated_date; idxmax"
+  },
+  {
+    "id": "x10",
+    "difficulty": "extreme",
+    "tables": ["orders"],
+    "question": "Among orders with order_status='delivered' and a non-null order_delivered_customer_date, compute elapsed delivery time = order_delivered_customer_date - order_purchase_timestamp in days (fractional). What is the maximum?",
+    "ground_truth": 209.63,
+    "answer_type": "float",
+    "tolerance": 0.02,
+    "gt_code": "delivered+non-null date; elapsed_days = delivered_date - purchase_timestamp; max"
+  },
+  {
+    "id": "x11",
+    "difficulty": "extreme",
+    "tables": ["order_items", "orders"],
+    "question": "Restrict to order_items rows whose order has order_status='delivered'. Bucket each item by the calendar month of its order's order_purchase_timestamp (NOT the delivery date). GMV = SUM(price + freight_value). Which month has the highest GMV? Answer as YYYY-MM.",
+    "ground_truth": "2017-11",
+    "answer_type": "string",
+    "tolerance": null,
+    "gt_code": "delivered items; bucket by strftime('%Y-%m', purchase_timestamp); sum(price+freight); idxmax"
+  },
+  {
+    "id": "x12",
+    "difficulty": "extreme",
+    "tables": ["orders", "customers"],
+    "question": "For each customers.customer_unique_id count its number of distinct order_ids (all statuses). Take the THIRD-highest distinct count value across customers. Several customers tie at that value; among those tied, return the customer_unique_id that sorts first lexicographically (ascending string order).",
+    "ground_truth": "1b6c7548a2a1f9037c1fd3ddfed95f33",
+    "answer_type": "string",
+    "tolerance": null,
+    "gt_code": "join orders+customers; groupby customer_unique_id nunique(order_id); distinct sorted desc counts [17,9,7]; among ties at 7, min() lexicographically"
+  },
+  {
+    "id": "x13",
+    "difficulty": "extreme",
+    "tables": ["orders", "order_items"],
+    "question": "How many order_ids in the orders table have NO matching rows at all in order_items?",
+    "ground_truth": 775,
+    "answer_type": "int",
+    "tolerance": null,
+    "gt_code": "orders.order_id set minus order_items.order_id set; count"
+  },
+  {
+    "id": "x14",
+    "difficulty": "extreme",
+    "tables": ["order_items", "products", "category_translation"],
+    "question": "Join order_items -> products, then LEFT JOIN product_category_name_translation. How many order_items ROWS end up with no English category name - either because products.product_category_name is null, or because it has no row in the translation table? Count all statuses.",
+    "ground_truth": 1627,
+    "answer_type": "int",
+    "tolerance": null,
+    "gt_code": "left join items->products->translation; count rows where product_category_name_english IS NULL"
+  },
+  {
+    "id": "x15",
+    "difficulty": "extreme",
+    "tables": ["orders", "reviews"],
+    "question": "Restrict to orders with order_status='delivered' and a non-null order_delivered_customer_date that also have a review. Attach one review per order using the latest review_creation_date (ties broken by latest review_answer_timestamp). LATE means order_delivered_customer_date > order_estimated_delivery_date as timestamps. Report mean(review_score of on-time orders) - mean(review_score of late orders).",
+    "ground_truth": 1.7287,
+    "answer_type": "float",
+    "tolerance": 0.0005,
+    "gt_code": "delivered+non-null date; latest review per order; split by late flag; mean(review_score) on-time minus mean late"
+  }
+]

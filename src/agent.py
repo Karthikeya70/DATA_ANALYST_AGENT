@@ -288,9 +288,15 @@ def run_agent(question, max_steps=MAX_STEPS, allow_repair=True, verbose=False,
                                 "latency": round(time.time() - t_start, 1),
                                 "model": model, "trajectory": trajectory}
                     repairs += 1  # error returned to model -> a repair attempt
+                # Full content is kept (not truncated) because evaluate.py's
+                # groundedness audit regex-scans this field for the answer
+                # number. Truncating it here previously caused false
+                # "ungrounded" verdicts whenever an unaliased SQL expression
+                # made the JSON's `columns` array alone exceed the old cutoff,
+                # pushing the actual `rows` data out of the stored text.
                 trajectory.append({"step": step, "type": "run_sql",
                                    "sql": sql, "ok": out["ok"],
-                                   "result_preview": content[:200]})
+                                   "result_preview": content})
 
             elif name == "sample_rows":
                 table = args.get("table", "")
