@@ -1,5 +1,7 @@
 # Data Analyst Agent
 
+**Live demo:** https://data-analyst-agent.calmhill-bfae2bec.centralindia.azurecontainerapps.io/
+
 This project answers questions about a real online store's data — things
 like "which product category made the most money?" — by writing a
 database query, running it, and reading back the real number. It does
@@ -238,6 +240,9 @@ publishes it, ready to run on a cloud host. There's no heavy AI software
 bundled inside the image — the "thinking" happens through an API call,
 and the actual number-crunching is just a small database file — so it
 stays small and starts up in about a second.
+
+It's currently running here:
+https://data-analyst-agent.calmhill-bfae2bec.centralindia.azurecontainerapps.io/
 
 ---
 
