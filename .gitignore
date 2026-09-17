@@ -5,3 +5,4 @@ data/raw/
 data/olist.db
 data/olist_poisoned.db
 *.log
+.claude/
